@@ -1,0 +1,39 @@
+Post- https://demo.docusign.net/restapi/v2.1/accounts/2bfcd187-e2ab-4721-aeca-d568e4c02c53/envelopes
+
+{
+    "emailSubject": "Please DocuSign: TPS REPORT`.pdf and Blank-Fax-Cover-Sheet-Free-",
+    "status": "sent",
+    "compositeTemplates": [{
+        "serverTemplates": [{
+            "sequence": "1",
+            "templateId": "2aa7f283-a0df-4edd-a4ce-5534fb637a1b"
+        }],
+        "inlineTemplates": [{
+            "sequence": "2",
+            "recipients": {
+                "signers": [{
+                    "email": "johndoe@test.test",
+                    "name": "John Doe",
+                    "recipientId": "1",
+                    "roleName": "Signer"
+                }]
+            }
+        }]
+    }, {
+        "serverTemplates": [{
+            "sequence": "3",
+            "templateId": "40869a93-c655-490c-b383-8c1ed0b5857e"
+        }],
+        "inlineTemplates": [{
+            "sequence": "4",
+            "recipients": {
+                "signers": [{
+                    "email": "janedoe@test.test",
+                    "name": "Jane Doe",
+                    "recipientId": "1",
+                    "roleName": "Signer"
+                }]
+            }
+        }]
+    }]
+}
