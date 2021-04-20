@@ -1,0 +1,114 @@
+This file documents the work I did for the Tech assessment!
+
+To set up, I followed DocuSign documentation, as well as Nima Poulad's instruction on Youtube, to link my DocuSign developer account to the DocuSign Postman collection. This allowed me execute the three tasks. I often referred to DocuSign documentation to learn more about the API, learn how to create envelopes, use templates to create envelopes, and to learn about specific parameters.
+
+
+Test1:
+
+I forked off from the base branch to create changes to the JSON file. In Postman, I troubleshooted the API call until the JSON had all the required parameters, there was no conflicting information (i.e. references to DocumentId 2 even though only one document was attached,) and the envelope successfully sent. I summarized the changes in my pull request, but I included the changes below for posterity:
+
+- For the first recipient, Barry Allen, I changed the document id from "2" to "1" since that's the only document included in this envelope.
+- For the second recipient, Bruce Wayne, there was an empty email string. So I included a (fake) email for this envelope to be sent to.
+- Bruce Wayne needed his own recipientID, so I assigned the value of 2 to him. Previously, he had the same id as Berry Allen.
+- Because signHereTabs need 0 or positive x-y positions, I changed the xPosition for Bruce Wayne to be positive. Also, because I figure that both Barry Allen and Bruce Wayne will need to sign in the same position within the document, assuming the positions for Barry Allen are correct, I used that position for Bruce Wayne.
+- Assuming Berry Allen and Bruce Wayne need to sign in the same position, and because this document only has one page, I changed page number to be "1" for Bruce Wayne.
+- Because envelopes need an email subject, I included the email subject "This is a test envelope."
+
+Here's the successful 201 code message!:
+
+{
+    "envelopeId": "bb436b63-9c7c-4958-88b1-92189c789e35",
+    "uri": "/envelopes/bb436b63-9c7c-4958-88b1-92189c789e35",
+    "statusDateTime": "2021-04-20T16:27:40.0470000Z",
+    "status": "sent"
+}
+
+
+Test2:
+
+As currently configured, this API call successfully runs. (I used Postman to run this.) The key distinction here is that this includes the parameter: "enforceSignerVisibility: true". Through documentation, I understand this means that if a document has a tab, only recipients that have a tab on a document, i.e. Barry Allen in this case, can view the documents.  
+
+Because Bruce Wayne isn't a signer on this document in how it's currently configured (i.e. he doesn't have a tab,) Bruce Wayne is unable to view the document.
+
+I imagine this feature becomes more robust and useful when there are multiple documents and multiple recipient types. Per documentation, this seems especially useful when senders want recipients to see only those files which they need to sign. They can make only one envelope with documents intended for individual recipients, rather than having to create a separate envelope for each recipient.
+
+Also, "enforceSignerVisiblity" can be coupled with with "excludedDocuments" to disallow administrative types (Agent, Editor, or Intermediaries) from seeing documents. Otherwise, when "recipientType" is an administrative type, they can always see documents being sent. 
+
+Here's the successful 201 code message!:
+
+{
+    "envelopeId": "4bfa0098-4ccc-47b1-876a-09db9eb9e2ba",
+    "uri": "/envelopes/4bfa0098-4ccc-47b1-876a-09db9eb9e2ba",
+    "statusDateTime": "2021-04-20T16:30:15.6270000Z",
+    "status": "sent"
+}
+
+
+
+Test3:
+
+In order to combine these two templates, I realized I had to use a composite template. In Postman, there's an Example to "Send an Envelope Using Composite Templates" that was useful.
+
+Also, I found documentation that helped outline the difference between the server and inline templates, as well as information about sequencing the templates. Lastly, I leveraged an example for using a composite template to send and sign documents for a real estate buyer and real estate seller.
+
+Because the templates weren't shared with me, I saved, copied, and uploaded my own versions of the templates into my DocuSign developer account. These created new templateIds that are different from the ones found in the TESTJSON1 and TESTJSON2 files. These are the templateIds I ultimately referenced in my API call. 
+
+I then created an API call, using the schema of the real estate buyer and real estate seller example, and referencing the templates that I uploaded. This ran a successful API call which combined the two templates given to me!
+
+I created a pull request with the JSON for the API call, but I'll reproduce it below for posterity:
+
+__________________________________________________________________________________________________________
+
+Post- https://demo.docusign.net/restapi/v2.1/accounts/2bfcd187-e2ab-4721-aeca-d568e4c02c53/envelopes
+
+{
+    "emailSubject": "Please DocuSign: TPS REPORT`.pdf and Blank-Fax-Cover-Sheet-Free-",
+    "status": "sent",
+    "compositeTemplates": [{
+        "serverTemplates": [{
+            "sequence": "1",
+            "templateId": "2aa7f283-a0df-4edd-a4ce-5534fb637a1b"
+        }],
+        "inlineTemplates": [{
+            "sequence": "2",
+            "recipients": {
+                "signers": [{
+                    "email": "johndoe@test.test",
+                    "name": "John Doe",
+                    "recipientId": "1",
+                    "roleName": "Signer"
+                }]
+            }
+        }]
+    }, {
+        "serverTemplates": [{
+            "sequence": "3",
+            "templateId": "40869a93-c655-490c-b383-8c1ed0b5857e"
+        }],
+        "inlineTemplates": [{
+            "sequence": "4",
+            "recipients": {
+                "signers": [{
+                    "email": "janedoe@test.test",
+                    "name": "Jane Doe",
+                    "recipientId": "1",
+                    "roleName": "Signer"
+                }]
+            }
+        }]
+    }]
+}
+
+__________________________________________________________________________________________________________
+
+Lastly, here's the successful 201 code message!
+
+{
+    "envelopeId": "8910a501-d183-4a15-a14a-9c4c62bd9a38",
+    "uri": "/envelopes/8910a501-d183-4a15-a14a-9c4c62bd9a38",
+    "statusDateTime": "2021-04-20T17:24:36.6900000Z",
+    "status": "sent"
+}
+
+
+Thank you so much, and I’m looking forward to discussing this and hearing any feedback.
